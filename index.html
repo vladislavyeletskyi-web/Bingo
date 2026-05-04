@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Комплекс неинтересного человека — Pantalone</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --bg:         #060810;
+    --card-bg:    #0a0d18;
+    --cell-bg:    #0d1220;
+    --cell-hover: #141a2e;
+    --border:     #c9a030;
+    --border-dim: #6a5418;
+    --gold:       #d4a832;
+    --gold-light: #f0c84a;
+    --teal:       #2a7a8a;
+    --teal-light: #3eb0c8;
+    --text:       #e8dfc8;
+    --text-dim:   #8a9ab0;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'EB Garamond', serif;
+    padding: 32px 16px 52px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 30% 20%, rgba(20,50,110,0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 70% 80%, rgba(15,60,80,0.25) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 45%, #000 100%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 700px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 26px;
+  }
+
+  /* ── Frame ── */
+  .frame {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border-dim);
+    box-shadow:
+      0 0 0 1px #000,
+      0 0 0 4px rgba(106,84,24,0.4),
+      0 0 0 5px #000,
+      0 0 60px rgba(30,80,160,0.2),
+      inset 0 0 80px rgba(0,0,0,0.5);
+    padding: 28px 24px 32px;
+    position: relative;
+  }
+
+  .corner { position:absolute; font-size:16px; color:var(--gold); opacity:0.7; line-height:1; }
+  .corner-tl { top:10px;    left:12px; }
+  .corner-tr { top:10px;    right:12px; }
+  .corner-bl { bottom:12px; left:12px; }
+  .corner-br { bottom:12px; right:12px; }
+
+  /* ── Header ── */
+  .header { text-align:center; margin-bottom:22px; }
+
+  .tag-line {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:5px;
+    text-transform:uppercase; color:var(--teal-light); margin-bottom:8px; opacity:0.6;
+  }
+  .title-main {
+    font-family:'Cinzel Decorative',serif;
+    font-size: clamp(20px,4vw,28px); font-weight:700;
+    color:var(--gold-light);
+    text-shadow:0 0 20px rgba(212,168,50,0.6),0 0 50px rgba(212,168,50,0.2);
+    letter-spacing:2px; line-height:1.2; margin-bottom:6px;
+  }
+  .title-sub {
+    font-family:'Cinzel',serif; font-size:clamp(11px,2.5vw,15px);
+    color:var(--text-dim); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px;
+  }
+  .divider { display:flex; align-items:center; gap:10px; justify-content:center; margin:10px 0; }
+  .divider-line {
+    flex:1; height:1px; max-width:140px;
+    background:linear-gradient(to right, transparent, var(--border), transparent);
+  }
+  .divider-gem { color:var(--teal-light); font-size:9px; opacity:0.8; }
+  .subtitle {
+    font-family:'EB Garamond',serif; font-style:italic;
+    font-size:clamp(10px,2vw,13px); color:var(--text-dim);
+    line-height:1.5; max-width:460px; margin:0 auto; opacity:0.75;
+  }
+
+  /* ── Grid ── */
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+
+  .cell {
+    background: var(--cell-bg);
+    border: 1px solid rgba(106,84,24,0.45);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.5);
+    padding: 13px 9px; min-height:108px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    position:relative; cursor:pointer; overflow:hidden; user-select:none;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    /* NO opacity animation — cells always visible */
+  }
+  .cell::before {
+    content:''; position:absolute; inset:3px;
+    border:1px solid rgba(42,122,138,0.1);
+    pointer-events:none; transition:border-color 0.3s;
+  }
+  .cell::after {
+    content:'◆'; position:absolute; top:5px; right:6px;
+    font-size:6px; color:var(--border-dim); opacity:0.5; transition:all 0.3s;
+  }
+
+  .cell:hover {
+    background:var(--cell-hover); border-color:rgba(180,140,40,0.5);
+    box-shadow:inset 0 0 25px rgba(20,60,120,0.2),0 4px 14px rgba(0,0,0,0.6);
+    transform:translateY(-1px);
+  }
+  .cell:hover::before { border-color:rgba(42,122,138,0.3); }
+  .cell:hover::after  { opacity:1; color:var(--gold); }
+  .cell:hover .cell-text { color:var(--text); }
+
+  .cell.marked {
+    background:linear-gradient(135deg,#0e1c3a,#091524);
+    border-color:var(--teal);
+    box-shadow:inset 0 0 30px rgba(30,90,160,0.3),0 0 14px rgba(42,122,138,0.2);
+  }
+  .cell.marked::before { border-color:rgba(62,176,200,0.25); }
+  .cell.marked::after  { content:'✦'; font-size:7px; color:var(--teal-light); opacity:1; }
+  .cell.marked .cell-text { color:var(--text); text-shadow:0 0 16px rgba(62,176,200,0.25); }
+
+  .cell-text {
+    font-family:'EB Garamond',serif;
+    font-size:clamp(10.5px,1.8vw,13.5px); line-height:1.45;
+    color:var(--text-dim); position:relative; z-index:1; transition:color 0.3s;
+  }
+
+  @keyframes markPulse {
+    0%   { box-shadow:inset 0 0 0 rgba(30,90,160,0); }
+    50%  { box-shadow:inset 0 0 40px rgba(30,90,160,0.5),0 0 20px rgba(42,122,138,0.3); }
+    100% { box-shadow:inset 0 0 30px rgba(30,90,160,0.3),0 0 14px rgba(42,122,138,0.2); }
+  }
+  .cell.marking { animation:markPulse 0.35s ease; }
+
+  .frame-footer { text-align:center; margin-top:18px; }
+  .frame-footer-text {
+    font-family:'Cinzel',serif; font-size:8px;
+    letter-spacing:3px; text-transform:uppercase; color:var(--border-dim); opacity:0.5;
+  }
+
+  /* ── Download button ── */
+  .download-area {
+    display:flex; flex-direction:column;
+    align-items:center; gap:10px; width:100%;
+  }
+  .btn-download {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:3px; text-transform:uppercase; color:#0a0d18;
+    background:linear-gradient(135deg,#c9a030,#f0c84a,#a07820);
+    border:none; padding:14px 44px; cursor:pointer;
+    clip-path:polygon(10px 0%,calc(100% - 10px) 0%,100% 50%,calc(100% - 10px) 100%,10px 100%,0% 50%);
+    box-shadow:0 0 30px rgba(200,160,40,0.25),0 4px 20px rgba(0,0,0,0.5);
+    transition:all 0.3s ease;
+  }
+  .btn-download:hover {
+    background:linear-gradient(135deg,#e0b840,#fff0a0,#b08830);
+    box-shadow:0 0 50px rgba(200,160,40,0.5),0 6px 24px rgba(0,0,0,0.5);
+    transform:translateY(-2px);
+  }
+  .btn-download.loading { opacity:0.5; cursor:not-allowed; pointer-events:none; }
+
+  .hint {
+    font-family:'EB Garamond',serif; font-style:italic;
+    font-size:12px; color:var(--text-dim); opacity:0.45; letter-spacing:1px;
+  }
+
+  /* ── Freeze mode: сброс всех эффектов перед рендером ── */
+  .freeze, .freeze * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="frame" id="bingo-frame">
+    <span class="corner corner-tl">✦</span>
+    <span class="corner corner-tr">✦</span>
+    <span class="corner corner-bl">✦</span>
+    <span class="corner corner-br">✦</span>
+
+    <div class="header">
+      <div class="tag-line">Fatui Harbinger № IX · House Lonne Community</div>
+      <div class="title-main">КОМПЛЕКС</div>
+      <div class="title-sub">«неинтересного человека»</div>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-gem">◆ ◆ ◆</span>
+        <div class="divider-line"></div>
+      </div>
+      <div class="subtitle">
+        переживания о том, что вы не являетесь для окружающих приоритетом,<br>
+        вас не хотят узнавать и запоминать какие‑то детали о вас
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="cell"><span class="cell-text">неприятный осадок от того, что перебивают</span></div>
+      <div class="cell"><span class="cell-text">я цепляюсь за тех, кто хоть немного проявил ко мне внимания</span></div>
+      <div class="cell"><span class="cell-text">стараюсь за всё шарить, чтобы не быть скучным/ой</span></div>
+      <div class="cell"><span class="cell-text">мне очень редко пишут первыми</span></div>
+      <div class="cell"><span class="cell-text">мои чувства в 99% случаев невзаимны</span></div>
+      <div class="cell"><span class="cell-text">у меня никогда не спрашивают совета / мнения</span></div>
+      <div class="cell"><span class="cell-text">про меня не запоминают мелкие детали (например что я люблю из еды)</span></div>
+      <div class="cell"><span class="cell-text">когда идём компанией, я часто иду позади без пары</span></div>
+      <div class="cell"><span class="cell-text">приходится искать общение в инете…</span></div>
+      <div class="cell"><span class="cell-text">из‑за нехватки и/или чтоб найти хоть кого‑то, кому будет не всё равно</span></div>
+      <div class="cell"><span class="cell-text">если бы не напоминалки, про моё ДР никто бы не помнил</span></div>
+      <div class="cell"><span class="cell-text">ко мне особо никогда не проявляют романтический интерес</span></div>
+      <div class="cell"><span class="cell-text">общаюсь активно, чтоб человек не потерял интерес</span></div>
+      <div class="cell"><span class="cell-text">у всех есть кто‑то ближе / важнее, чем я</span></div>
+      <div class="cell"><span class="cell-text">переживания, что меня опять не выберут…</span></div>
+      <div class="cell"><span class="cell-text">…когда встанет вопрос «я или они»</span></div>
+    </div>
+
+    <div class="frame-footer">
+      <div class="frame-footer-text">◆ &nbsp; нажми на клетку, чтобы отметить &nbsp; ◆</div>
+    </div>
+  </div>
+
+  <div class="download-area">
+    <button class="btn-download" id="btn-dl">Сохранить как изображение</button>
+    <span class="hint">отметь нужные клетки — потом сохраняй</span>
+  </div>
+</div>
+
+<script>
+  // ── Клетки ──
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      cell.classList.toggle('marked');
+      cell.classList.add('marking');
+      cell.addEventListener('animationend', () => cell.classList.remove('marking'), { once: true });
+    });
+  });
+
+  // ── Скачать ──
+  document.getElementById('btn-dl').addEventListener('click', async () => {
+    const btn   = document.getElementById('btn-dl');
+    const frame = document.getElementById('bingo-frame');
+
+    btn.textContent = 'Генерируется…';
+    btn.classList.add('loading');
+
+    // 1. Замораживаем все анимации/трансформации
+    frame.classList.add('freeze');
+
+    // 2. Ждём один кадр, чтобы браузер применил стили
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    try {
+      const rect = frame.getBoundingClientRect();
+
+      const canvas = await html2canvas(frame, {
+        backgroundColor: '#0a0d18',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        width:  rect.width,
+        height: frame.scrollHeight,   // полная высота, не viewport
+        windowWidth:  document.documentElement.scrollWidth,
+        windowHeight: frame.scrollHeight,
+      });
+
+      const link = document.createElement('a');
+      link.download = 'pantalone_bingo.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      alert('Не удалось :( Попробуй скриншот вручную.');
+      console.error(err);
+    } finally {
+      frame.classList.remove('freeze');
+      btn.textContent = 'Сохранить как изображение';
+      btn.classList.remove('loading');
+    }
+  });
+</script>
+</body>
+</html>

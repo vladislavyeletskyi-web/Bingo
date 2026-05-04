@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мой Комфорт — Venti</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cormorant+SC:wght@300;400;600&family=Tenor+Sans&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --bg:          #ddeef0;
+    --card-bg:     #f4fbfc;
+    --cell-bg:     #ffffff;
+    --cell-hover:  #edf8f8;
+    --cell-marked: #d4f0ed;
+    --border:      #7ecec8;
+    --border-dim:  #b5e0dc;
+    --teal:        #3dada6;
+    --teal-dark:   #22756f;
+    --teal-light:  #a8dedd;
+    --mint:        #c6eeea;
+    --sky:         #b8d9e8;
+    --gold:        #b8913a;
+    --gold-light:  #d4aa55;
+    --text:        #1e4a48;
+    --text-dim:    #5a8a88;
+    --text-light:  #8ab5b3;
+    --white:       #ffffff;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Cormorant Garamond', serif;
+    padding: 32px 16px 52px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Soft sky gradient */
+  body::before {
+    content:''; position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(180,220,235,0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 90%, rgba(150,220,210,0.4) 0%, transparent 60%),
+      linear-gradient(170deg, #cde8ef 0%, #ddf0ec 50%, #cfe9f0 100%);
+    pointer-events:none; z-index:0;
+  }
+
+  /* Subtle wind swirl texture */
+  body::after {
+    content:''; position:fixed; inset:0;
+    background-image:
+      radial-gradient(ellipse 30% 60% at 5% 50%, rgba(255,255,255,0.3) 0%, transparent 70%),
+      radial-gradient(ellipse 20% 40% at 95% 30%, rgba(255,255,255,0.25) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+
+  .wrapper {
+    position:relative; z-index:1;
+    width:100%; max-width:700px;
+    display:flex; flex-direction:column;
+    align-items:center; gap:26px;
+  }
+
+  /* ── Frame ── */
+  .frame {
+    width:100%;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,0.6),
+      0 0 0 6px var(--border-dim),
+      0 8px 40px rgba(60,160,155,0.15),
+      0 2px 10px rgba(60,160,155,0.08),
+      inset 0 0 60px rgba(200,240,238,0.3);
+    padding: 30px 24px 32px;
+    position: relative;
+  }
+
+  /* Outer thin decorative line */
+  .frame::before {
+    content:''; position:absolute; inset:5px;
+    border: 1px solid rgba(126,206,200,0.35);
+    pointer-events:none;
+  }
+
+  .corner { position:absolute; font-size:14px; color:var(--teal); opacity:0.6; line-height:1; }
+  .corner-tl { top:10px;    left:12px; }
+  .corner-tr { top:10px;    right:12px; }
+  .corner-bl { bottom:12px; left:12px; }
+  .corner-br { bottom:12px; right:12px; }
+
+  /* ── Header ── */
+  .header { text-align:center; margin-bottom:24px; }
+
+  .tag-line {
+    font-family:'Cormorant SC', serif; font-size:9px;
+    letter-spacing:5px; text-transform:uppercase;
+    color:var(--text-light); margin-bottom:10px;
+  }
+
+  /* Wind ornament */
+  .wind-ornament {
+    display:flex; align-items:center; justify-content:center;
+    gap:6px; margin-bottom:10px;
+  }
+  .wind-ornament svg { opacity:0.45; }
+
+  .title-wrap {
+    display:flex; align-items:baseline; justify-content:center;
+    gap:10px; margin-bottom:4px;
+  }
+  .title-sub-word {
+    font-family:'Cormorant SC', serif;
+    font-size:clamp(13px,2.5vw,17px); font-weight:300;
+    color:var(--teal-dark); letter-spacing:5px; text-transform:uppercase; opacity:0.7;
+  }
+  .title-main {
+    font-family:'Cormorant SC', serif;
+    font-size:clamp(22px,4.5vw,32px); font-weight:600;
+    color:var(--teal-dark);
+    text-shadow: 0 2px 12px rgba(61,173,166,0.2);
+    letter-spacing:3px;
+  }
+
+  .title-bingo {
+    font-family:'Tenor Sans', sans-serif;
+    font-size:clamp(10px,2vw,12px);
+    color:var(--text-light); letter-spacing:8px; text-transform:uppercase;
+    margin-bottom:12px; opacity:0.6;
+  }
+
+  .divider { display:flex; align-items:center; gap:10px; justify-content:center; margin:8px 0; }
+  .divider-line {
+    flex:1; height:1px; max-width:130px;
+    background:linear-gradient(to right, transparent, var(--border), transparent);
+  }
+  .divider-gem { color:var(--teal); font-size:8px; opacity:0.6; }
+
+  /* ── Grid ── */
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+
+  .cell {
+    background: var(--cell-bg);
+    border: 1px solid var(--border-dim);
+    box-shadow: 0 2px 8px rgba(60,160,155,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
+    padding:13px 9px; min-height:100px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    position:relative; cursor:pointer; overflow:hidden; user-select:none;
+    transition:background 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  }
+
+  /* Subtle inner corner accent */
+  .cell::after {
+    content:'◇'; position:absolute; top:4px; right:6px;
+    font-size:7px; color:var(--border); opacity:0.4; transition:all 0.25s;
+  }
+
+  .cell:hover {
+    background:var(--cell-hover); border-color:var(--border);
+    box-shadow:0 4px 16px rgba(60,160,155,0.14), inset 0 0 0 1px rgba(255,255,255,0.9);
+    transform:translateY(-1px);
+  }
+  .cell:hover::after { opacity:0.8; color:var(--teal); content:'◆'; }
+  .cell:hover .cell-text { color:var(--text); }
+
+  .cell.marked {
+    background: linear-gradient(135deg, #d8f3f0, #e8faf8);
+    border-color: var(--teal);
+    box-shadow: 0 4px 16px rgba(60,160,155,0.18), inset 0 0 20px rgba(130,220,215,0.15);
+  }
+  .cell.marked::after { content:'✦'; font-size:7px; color:var(--teal); opacity:0.9; }
+  .cell.marked .cell-text { color:var(--teal-dark); }
+
+  .cell-text {
+    font-family:'Cormorant Garamond', serif;
+    font-size:clamp(11px,1.8vw,13.5px); line-height:1.45; font-weight:400;
+    color:var(--text-dim); position:relative; z-index:1; transition:color 0.25s;
+  }
+
+  @keyframes markPulse {
+    0%   { box-shadow:0 0 0 rgba(60,160,155,0); }
+    50%  { box-shadow:0 0 24px rgba(60,160,155,0.35), inset 0 0 20px rgba(130,220,215,0.3); }
+    100% { box-shadow:0 4px 16px rgba(60,160,155,0.18), inset 0 0 20px rgba(130,220,215,0.15); }
+  }
+  .cell.marking { animation:markPulse 0.35s ease; }
+
+  .frame-footer { text-align:center; margin-top:18px; }
+  .frame-footer-text {
+    font-family:'Cormorant SC', serif; font-size:8px;
+    letter-spacing:4px; text-transform:uppercase; color:var(--text-light); opacity:0.5;
+  }
+
+  /* ── Download ── */
+  .download-area {
+    display:flex; flex-direction:column;
+    align-items:center; gap:10px; width:100%;
+  }
+  .btn-download {
+    font-family:'Cormorant SC', serif; font-size:12px;
+    letter-spacing:3px; text-transform:uppercase; color:var(--white);
+    background:linear-gradient(135deg, #3dada6, #5cc8c1, #22756f);
+    border:none; padding:14px 44px; cursor:pointer;
+    border-radius:1px;
+    box-shadow:0 4px 20px rgba(60,160,155,0.3), 0 1px 3px rgba(0,0,0,0.1);
+    transition:all 0.3s ease;
+  }
+  .btn-download:hover {
+    background:linear-gradient(135deg, #4dbfb8, #70d8d2, #2a8a83);
+    box-shadow:0 6px 28px rgba(60,160,155,0.45), 0 2px 6px rgba(0,0,0,0.1);
+    transform:translateY(-2px);
+  }
+  .btn-download.loading { opacity:0.5; cursor:not-allowed; pointer-events:none; }
+
+  .hint {
+    font-family:'Cormorant Garamond', serif; font-style:italic;
+    font-size:13px; color:var(--text-light); opacity:0.7; letter-spacing:1px;
+  }
+
+  .freeze, .freeze * {
+    animation:none !important; transition:none !important; transform:none !important;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="frame" id="bingo-frame">
+    <span class="corner corner-tl">✦</span>
+    <span class="corner corner-tr">✦</span>
+    <span class="corner corner-bl">✦</span>
+    <span class="corner corner-br">✦</span>
+
+    <div class="header">
+      <div class="tag-line">House Lonne Community</div>
+
+      <!-- wind ornament SVG -->
+      <div class="wind-ornament">
+        <svg width="60" height="14" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 7 Q10 2 18 7 Q26 12 34 7 Q42 2 50 7 Q56 10 58 7" stroke="#3dada6" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="2.5" fill="#3dada6" opacity="0.7"/></svg>
+        <svg width="60" height="14" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 7 Q10 12 18 7 Q26 2 34 7 Q42 12 50 7 Q56 4 58 7" stroke="#3dada6" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="title-wrap">
+        <span class="title-sub-word">МОЙ</span>
+        <span class="title-main">КОМФОРТ</span>
+      </div>
+      <div class="title-bingo">B &nbsp; I &nbsp; N &nbsp; G &nbsp; O</div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-gem">◆ ◆ ◆</span>
+        <div class="divider-line"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="cell"><span class="cell-text">мне комфортно разговаривать на личные темы</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно с тактильными людьми</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда друзья шутят надо мной</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно ночевать в чужом доме</span></div>
+
+      <div class="cell"><span class="cell-text">мне комфортно разговаривать с незнакомцами</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно знакомиться с новыми людьми</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно находиться в чужой компании</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда трогают мои личные вещи</span></div>
+
+      <div class="cell"><span class="cell-text">мне комфортно есть или пить из одной посуды</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда кто‑то делает мне подарки</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда кто‑то ставит меня на первое место</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда мне уделяют особое внимание</span></div>
+
+      <div class="cell"><span class="cell-text">мне комфортно слушать критику в свою сторону</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно в одиночестве</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно в компании</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно в любой одежде</span></div>
+
+      <div class="cell"><span class="cell-text">мне комфортно когда меня неожиданно фотографируют</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда прислушиваются к моему мнению</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда за меня принимают решения</span></div>
+      <div class="cell"><span class="cell-text">мне комфортно когда за меня заступаются</span></div>
+    </div>
+
+    <div class="frame-footer">
+      <div class="frame-footer-text">◆ &nbsp; нажми на клетку, чтобы отметить &nbsp; ◆</div>
+    </div>
+  </div>
+
+  <div class="download-area">
+    <button class="btn-download" id="btn-dl">Сохранить как изображение</button>
+    <span class="hint">отметь нужные клетки — потом сохраняй</span>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      cell.classList.toggle('marked');
+      cell.classList.add('marking');
+      cell.addEventListener('animationend', () => cell.classList.remove('marking'), { once: true });
+    });
+  });
+
+  document.getElementById('btn-dl').addEventListener('click', async () => {
+    const btn   = document.getElementById('btn-dl');
+    const frame = document.getElementById('bingo-frame');
+
+    btn.textContent = 'Генерируется…';
+    btn.classList.add('loading');
+
+    frame.classList.add('freeze');
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    try {
+      const rect = frame.getBoundingClientRect();
+      const canvas = await html2canvas(frame, {
+        backgroundColor: '#f4fbfc',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        width:  rect.width,
+        height: frame.scrollHeight,
+        windowWidth:  document.documentElement.scrollWidth,
+        windowHeight: frame.scrollHeight,
+      });
+
+      const link = document.createElement('a');
+      link.download = 'comfort_bingo.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      alert('Не удалось :( Попробуй скриншот вручную.');
+      console.error(err);
+    } finally {
+      frame.classList.remove('freeze');
+      btn.textContent = 'Сохранить как изображение';
+      btn.classList.remove('loading');
+    }
+  });
+</script>
+</body>
+</html>
